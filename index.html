@@ -9,68 +9,37 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
       crossorigin="anonymous"
     />
-    <!-- GitHub Pages 单页应用路由修复 - 完全版 -->
+    <!-- GitHub Pages SPA 路由修复 - 增强版 -->
     <script>
-      // 这个脚本专门解决GitHub Pages上SPA应用的路由问题
-      // 确保所有URL路径都能正确指向index.html
       (function() {
-        // 检查是否在GitHub Pages环境
+        // 处理从 404.html 重定向过来的请求
+        var redirect = new URLSearchParams(window.location.search).get('redirect');
+        if (redirect) {
+          // 移除查询参数并更新历史记录
+          var cleanUrl = window.location.pathname;
+          if (redirect !== '/' && redirect !== '') {
+            cleanUrl = redirect;
+          }
+          window.history.replaceState({}, '', cleanUrl);
+        }
+        
+        // 检测是否在 GitHub Pages 环境
         if (window.location.hostname.includes('github.io')) {
-          // 获取当前路径
-          const path = window.location.pathname;
+          // 处理直接访问子路径的情况
+          var path = window.location.pathname;
           
-          // 检查是否已经是index.html或者是文件路径(有扩展名)
-          if (path.endsWith('/index.html') || /\.[^/.]+$/.test(path)) {
-            return;
+          // 如果路径不是根路径且不以 index.html 结尾
+          if (path !== '/' && !path.endsWith('/index.html') && !/\.[^/.]+$/.test(path)) {
+            // 获取仓库名称
+            var pathSegments = path.split('/').filter(Boolean);
+            var repoName = pathSegments.length > 0 ? pathSegments[0] : '';
+            
+            // 构建重定向 URL
+            var targetUrl = repoName ? `/${repoName}/?redirect=${encodeURIComponent(path)}` : `/?redirect=${encodeURIComponent(path)}`;
+            window.location.replace(targetUrl);
           }
-          
-          // 获取仓库名称
-          const pathSegments = path.split('/').filter(Boolean);
-          const repoName = pathSegments.length > 0 ? pathSegments[0] : '';
-          
-          // 构建基础路径
-          const basePath = repoName ? `/${repoName}` : '';
-          
-          // 构建完整的重定向URL
-          let targetPath = path;
-          
-          // 如果URL已经包含仓库名称，则提取相对路径
-          if (repoName && path.startsWith(`/${repoName}`)) {
-            targetPath = path.substring(repoName.length + 1) || '/';
-            if (!targetPath.startsWith('/')) targetPath = `/${targetPath}`;
-          }
-          
-          // 重定向到index.html并带上原始路径作为查询参数
-          window.location.replace(`${basePath}/index.html?path=${encodeURIComponent(targetPath)}`);
         }
       })();
-    </script>
-    
-    <!-- 404页面自动修复脚本 -->
-    <script>
-      // 当检测到GitHub Pages的404页面时自动修复
-      if (typeof window !== 'undefined') {
-        window.addEventListener('DOMContentLoaded', function() {
-          // 检测是否是GitHub Pages的404页面
-          if (document.title.includes('404') && 
-              document.body.textContent?.includes('There isn\'t a GitHub Pages site here') && 
-              window.location.hostname.includes('github.io')) {
-            
-            // 获取仓库名称和当前路径
-            const pathSegments = window.location.pathname.split('/').filter(Boolean);
-            const repoName = pathSegments.length > 0 ? pathSegments[0] : '';
-            
-            // 构建基础路径和目标路径
-            const basePath = repoName ? `/${repoName}` : '';
-            const targetPath = window.location.pathname.startsWith(`/${repoName}`) 
-              ? window.location.pathname.substring(repoName.length + 1) || '/'
-              : window.location.pathname;
-            
-            // 重定向到正确的URL
-            window.location.replace(`${basePath}/index.html?path=${encodeURIComponent(targetPath)}`);
-          }
-        });
-      }
     </script>
   </head>
   <body>
