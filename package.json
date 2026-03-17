@@ -8,7 +8,7 @@
     "dev": "pnpm dev:client",
     "build:client": "vite build --outDir dist/static",
     "build":"vite build --base=/sports-standards-search-coze",
-    "build:github": "vite build --base=/sports-standards-search-coze"
+    "build:github": "vite build --base=/"
   },
   "dependencies": {
     "clsx": "^2.1.1",
