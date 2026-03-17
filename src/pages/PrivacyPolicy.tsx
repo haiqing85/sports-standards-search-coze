@@ -14,6 +14,28 @@ export default function PrivacyPolicy() {
     
     return () => clearTimeout(timer);
   }, []);
+  
+  // 添加错误处理 - 如果URL路径有问题，确保能正确显示页面
+  useEffect(() => {
+    const checkUrlPath = () => {
+      // 确保在GitHub Pages环境中也能正确加载
+      if (window.location.pathname.includes('404.html')) {
+        // 如果检测到404页面，尝试重写路径
+        const path = new URLSearchParams(window.location.search).get('path') || '/privacy';
+        window.history.replaceState(null, '', path);
+      }
+    };
+    
+    // 立即检查
+    checkUrlPath();
+    
+    // 监听popstate事件，处理浏览器后退/前进操作
+    window.addEventListener('popstate', checkUrlPath);
+    
+    return () => {
+      window.removeEventListener('popstate', checkUrlPath);
+    };
+  }, []);
 
   const handleBack = () => {
     navigate(-1);

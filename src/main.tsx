@@ -5,34 +5,41 @@ import { Toaster } from 'sonner';
 import App from "./App.tsx";
 import "./index.css";
 
-// 修复GitHub Pages路由问题 - 增强版
-function getGitHubPagesPath() {
-  const urlParams = new URLSearchParams(window.location.search);
-  return urlParams.get('path') || '/';
-}
-
-// 检查当前环境是否为GitHub Pages
-function isGitHubPages() {
-  return window.location.hostname.includes('github.io');
-}
-
-// 增强的路由修复逻辑
-if (isGitHubPages()) {
-  const path = getGitHubPagesPath();
-  
-  // 检查当前路径是否需要修复
-  const needsFix = path !== window.location.pathname;
-  
-  // 如果路径需要修复，使用replaceState更新URL
-  if (needsFix) {
-    window.history.replaceState(null, '', path);
+// 修复GitHub Pages路由问题 - 完全版
+function setupGitHubPagesRouting() {
+  // 检查当前环境是否为GitHub Pages
+  if (window.location.hostname.includes('github.io')) {
+    // 获取URL查询参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const pathParam = urlParams.get('path');
+    
+    // 如果URL中包含path参数，使用它来设置正确的路由
+    if (pathParam) {
+      // 确保路径以/开头
+      const targetPath = pathParam.startsWith('/') ? pathParam : `/${pathParam}`;
+      
+      // 使用replaceState更新URL而不触发页面刷新
+      window.history.replaceState(null, '', targetPath);
+      
+      // 确保React Router能正确处理更新后的路径
+      window.dispatchEvent(new Event('popstate'));
+    }
+    
+    // 处理浏览器后退/前进按钮
+    window.addEventListener('popstate', function() {
+      const newUrlParams = new URLSearchParams(window.location.search);
+      const newPathParam = newUrlParams.get('path');
+      
+      if (newPathParam) {
+        const targetPath = newPathParam.startsWith('/') ? newPathParam : `/${newPathParam}`;
+        window.history.replaceState(null, '', targetPath);
+      }
+    });
   }
-  
-  // 确保base path正确设置
-  const basePath = window.location.pathname.split('/')[1] || '';
-  // 添加全局变量供其他组件使用
-  (window as any).__GITHUB_PAGES_BASE_PATH = basePath;
 }
+
+// 在应用启动时设置GitHub Pages路由
+setupGitHubPagesRouting();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

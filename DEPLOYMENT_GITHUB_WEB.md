@@ -180,6 +180,7 @@
    - 等待10-15分钟，GitHub Pages可能需要时间来部署
    - 检查项目根目录是否有index.html文件
    - 确认package.json中的build脚本是否正确设置为`"build": "vite build --base=/"`
+   - 如果隐私政策、使用条款或免责声明页面出现404，请确保您已经配置了GitHub Actions自动构建（第85-161节），或手动重新部署项目
 
  3. **GitHub Actions部署失败**
    - 点击"Actions"选项卡查看详细错误日志
