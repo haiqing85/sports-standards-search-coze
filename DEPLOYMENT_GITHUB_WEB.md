@@ -65,18 +65,19 @@
    ![Pages选项](https://space.coze.cn/api/coze_space/gen_image?image_size=square&prompt=GitHub+repository+pages+option&sign=68a22a913fb091f8976aeb5e7b31aa12)
 
 3. 在GitHub Pages设置页面：
-   - 在"Source"部分，点击下拉菜单，选择"main"分支
+   - 在"Source"部分，点击下拉菜单，选择"main"分支（如果使用GitHub Actions自动构建，则应选择"gh-pages"分支）
    - 在"/ (root)"或"/docs"选项中，选择"/root"
    - 点击"Save"按钮
 
    ![GitHub Pages设置](https://space.coze.cn/api/coze_space/gen_image?image_size=landscape_16_9&prompt=GitHub+pages+settings+interface&sign=58933ef3827f4b9d22dca62b4ed3eeff)
 
-4. 等待几分钟，GitHub Pages会自动构建并部署您的网站
+4. 等待10-15分钟，GitHub Pages会自动构建并部署您的网站
 
 ### 步骤2：访问您的网站
 
-1. 配置完成后，您将在GitHub Pages设置页面看到一个绿色的提示，显示您的网站已经部署成功，并提供了一个访问链接
+1. 配置完成后，您将在GitHub Pages设置页面看到一个绿色的提示，显示您的网站已经部署成功，并提供了一个访问链接，格式为 `https://[您的用户名].github.io/[仓库名称]`
 2. 点击该链接，您就可以访问部署在GitHub Pages上的体育行业标准查询系统了
+3. 注意：首次部署可能需要等待10-15分钟才能完全生效
 
    ![GitHub Pages部署成功](https://space.coze.cn/api/coze_space/gen_image?image_size=square&prompt=GitHub+pages+deployment+success+message&sign=f61b86fcf13246352da521c435634d04)
 
@@ -174,15 +175,16 @@
    - 尝试分批上传文件
    - 检查网络连接是否稳定
 
-2. **GitHub Pages网站无法访问**
-   - 确认您选择了正确的分支和目录
-   - 等待几分钟，GitHub Pages可能需要时间来部署
+ 2. **GitHub Pages网站无法访问**
+   - 确认您选择了正确的分支（main或gh-pages）和目录（/root）
+   - 等待10-15分钟，GitHub Pages可能需要时间来部署
    - 检查项目根目录是否有index.html文件
+   - 确认package.json中的build脚本是否正确设置为`"build": "vite build --base=/"`
 
-3. **GitHub Actions部署失败**
+ 3. **GitHub Actions部署失败**
    - 点击"Actions"选项卡查看详细错误日志
    - 确认您添加的密钥信息是否正确
-   - 检查项目的构建脚本是否能正常运行
+   - 检查项目的构建脚本是否能正常运行（应为`"build": "vite build --base=/"`）
 
 ## 其他注意事项
 

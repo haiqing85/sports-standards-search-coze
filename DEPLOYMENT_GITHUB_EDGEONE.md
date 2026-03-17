@@ -86,11 +86,11 @@
 
 ### 步骤1：准备项目构建配置
 
-确保您的项目已经配置了正确的构建命令。在`package.json`文件中，应该有类似以下的构建脚本：
+ 确保您的项目已经配置了正确的构建命令。在`package.json`文件中，应该有类似以下的构建脚本：
 
 ```json
 "scripts": {
-  "build": "rm -rf dist && pnpm build:client && cp package.json dist && touch dist/build.flag"
+  "build": "vite build --base=/"
 }
 ```
 
@@ -190,6 +190,7 @@ jobs:
 - 检查GitHub Actions日志，查看具体失败原因
 - 确认腾讯云API密钥是否正确，并且具有足够的权限
 - 检查项目构建是否成功，确保`dist`目录正确生成
+- 确认package.json中的build脚本是否正确设置为`"build": "vite build --base=/"`
 
 ### 网站无法访问
 

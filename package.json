@@ -6,8 +6,8 @@
   "scripts": {
     "dev:client": "vite --host --port 3000",
     "dev": "pnpm dev:client",
-    "build:client": "vite build --outDir dist/static",
-    "build":"vite build --base=/sports-standards-search-coze/",
+    "build:client": "vite build",
+    "build": "vite build --base=/",
     "build:github": "vite build --base=/"
   },
   "dependencies": {

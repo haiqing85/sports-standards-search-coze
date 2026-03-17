@@ -27,13 +27,22 @@ const StandardContext = createContext<StandardContextType>({
 export const StandardProvider = ({ children }: { children: React.ReactNode }) => {
   // 从localStorage加载数据，如果没有则使用默认数据
   const [standardsData, setStandardsData] = useState<any[]>(() => {
-    const savedStandards = localStorage.getItem('standards');
-    return savedStandards ? JSON.parse(savedStandards) : standards;
+    try {
+      const savedStandards = localStorage.getItem('standards');
+      return savedStandards ? JSON.parse(savedStandards) : standards;
+    } catch (error) {
+      console.error('Error loading standards from localStorage:', error);
+      return standards;
+    }
   });
 
   // 保存数据到localStorage
   useEffect(() => {
-    localStorage.setItem('standards', JSON.stringify(standardsData));
+    try {
+      localStorage.setItem('standards', JSON.stringify(standardsData));
+    } catch (error) {
+      console.error('Error saving standards to localStorage:', error);
+    }
   }, [standardsData]);
 
   // 搜索标准

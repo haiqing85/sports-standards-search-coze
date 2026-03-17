@@ -28,11 +28,11 @@
 1. 登录后，点击右上角的"+"图标，选择"New repository"
    ![创建仓库按钮](https://space.coze.cn/api/coze_space/gen_image?image_size=square&prompt=GitHub+create+new+repository+button&sign=ffce80e56c122b404935fe32b06ba88b)
 
-2. 在新建仓库页面，填写以下信息：
+ 2. 在新建仓库页面，填写以下信息：
    - **Repository name**: 为您的项目命名，例如 `sports-standards-search`
    - **Description**: 可选，简单描述您的项目，例如"体育行业标准查询系统"
    - **Visibility**: 选择"Public"（必须选择公开，私有仓库的GitHub Pages需要付费）
-   - 不要勾选任何初始化选项（如"Add a README file"、".gitignore"或"License"）
+   - 不要勾选任何初始化选项（如"Add a README file"、".gitignore"或"License"），因为项目文件中已经包含了这些文件
 
    ![创建仓库表单](https://space.coze.cn/api/coze_space/gen_image?image_size=landscape_16_9&prompt=GitHub+new+repository+form&sign=5896413474653805f2013e65b4095568)
 
@@ -60,16 +60,36 @@
 
 ## 第二部分：配置GitHub Pages
 
-### 步骤1：修改项目配置（重要）
+### 步骤1：项目配置确认（重要）
 
-1. 在GitHub仓库页面，点击文件名列表中的`package.json`文件
-2. 点击右上角的铅笔图标编辑文件
-3. 找到`build`脚本，将其修改为：
+项目中已经配置了正确的构建参数，确保在GitHub Pages上部署时，网站的静态资源能够正确加载。
+
+**已配置的关键设置：**
+- `package.json`中的`build`脚本已经设置为`"build": "vite build --base=/"`
+- 项目中包含了`404.html`文件，用于解决单页应用的路由问题
+- `index.html`中添加了路由修复脚本
+- `src/main.tsx`中添加了路由处理逻辑
+
+这些配置确保了GitHub Pages能够正确处理单页应用的路由，避免刷新页面时出现404错误。
+
+如果需要手动确认或修改配置，请按照以下步骤操作：
+
+**本地项目确认步骤：**
+1. 在您的计算机上打开下载并解压的项目文件夹
+2. 使用文本编辑器打开`package.json`文件
+3. 确认`scripts`部分中的`build`脚本是否为：
    ```json
    "build": "vite build --base=/"
    ```
-   （这确保构建后的文件路径正确）
-4. 滚动到页面底部，输入提交信息，然后点击"Commit changes"按钮
+4. 如果不是，请按照上述格式修改并保存文件
+
+**GitHub网页端确认步骤（如果您直接在GitHub上编辑）：**
+1. 在GitHub仓库页面，点击文件名列表中的`package.json`文件
+2. 确认`build`脚本是否为：
+   ```json
+   "build": "vite build --base=/"
+   ```
+3. 如果不是，点击右上角的铅笔图标编辑文件，修改后点击"Commit changes"按钮保存
 
 ### 步骤2：启用GitHub Pages
 
@@ -90,14 +110,15 @@
 
 ### 步骤3：访问您的网站
 
-1. 配置完成后，您将在GitHub Pages设置页面看到一个绿色的提示，显示您的网站已经部署成功，并提供了一个访问链接，格式为 `https://[您的用户名].github.io/[仓库名称]`
-2. 点击该链接，您就可以访问部署在GitHub Pages上的体育行业标准查询系统了
+ 1. 配置完成后，您将在GitHub Pages设置页面看到一个绿色的提示，显示您的网站已经部署成功，并提供了一个访问链接，格式为 `https://[您的用户名].github.io/[仓库名称]`
+ 2. 点击该链接，您就可以访问部署在GitHub Pages上的体育行业标准查询系统了
+ 3. 注意：首次部署可能需要等待10-15分钟才能完全生效
 
-   ![GitHub Pages部署成功](https://space.coze.cn/api/coze_space/gen_image?image_size=square&prompt=GitHub+pages+deployment+success+message&sign=f61b86fcf13246352da521c435634d04)
+    ![GitHub Pages部署成功](https://space.coze.cn/api/coze_space/gen_image?image_size=square&prompt=GitHub+pages+deployment+success+message&sign=f61b86fcf13246352da521c435634d04)
 
 ## 第三部分：自动构建与部署
 
-为了让GitHub Pages能够正确展示React应用，我们需要配置GitHub Actions来自动构建项目。
+为了让GitHub Pages能够正确展示React应用并解决路由问题，我们需要配置GitHub Actions来自动构建项目，并确保正确处理单页应用的路由。
 
 ### 步骤1：创建GitHub Actions工作流文件
 
@@ -106,21 +127,29 @@
 
 2. 在文件名框中输入`.github/workflows/deploy.yml`（注意前面的点号）
 
-3. 在文件内容区域，粘贴以下代码：
-   ```yaml
-   name: Deploy React App to GitHub Pages
+ 3. 在文件内容区域，粘贴以下代码：
+    ```yaml
+    name: Deploy React App to GitHub Pages
 
-   on:
-     push:
-       branches: [ main ]  # 或 master，取决于您的默认分支
-     pull_request:
-       branches: [ main ]
+    on:
+      push:
+        branches: [ main ]  # 或 master，取决于您的默认分支
+      pull_request:
+        branches: [ main ]
 
-   jobs:
-     build-and-deploy:
-       runs-on: ubuntu-latest
-       steps:
-         - name: Checkout code
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    jobs:
+      build-and-deploy:
+        runs-on: ubuntu-latest
+        environment:
+          name: github-pages
+          url: ${{ steps.deployment.outputs.page_url }}
+        steps:
+          - name: Checkout code
            uses: actions/checkout@v3
 
          - name: Setup Node.js
@@ -134,20 +163,28 @@
          - name: Build project
            run: npm run build
 
-         - name: Deploy to GitHub Pages
-           uses: JamesIves/github-pages-deploy-action@4.1.7
-           with:
-             branch: gh-pages
-             folder: dist/static
+          - name: Setup Pages
+            uses: actions/configure-pages@v5
+
+          - name: Upload artifact
+            uses: actions/upload-pages-artifact@v3
+            with:
+              path: './dist'
+
+          - name: Deploy to GitHub Pages
+            id: deployment
+            uses: actions/deploy-pages@v4
    ```
 
 4. 滚动到页面底部，输入提交信息，然后点击"Commit new file"按钮
 
 ### 步骤2：更新GitHub Pages设置
 
-1. 回到"Settings" > "Pages"设置页面
-2. 在"Source"部分，将分支从"main"更改为"gh-pages"
-3. 点击"Save"按钮
+  1. 回到"Settings" > "Pages"设置页面
+  2. 在"Source"部分，选择"Deploy from a branch"
+  3. 从下拉菜单中选择"gh-pages"分支
+  4. 在"/ (root)"或"/docs"选项中，确保选择"/root"
+ 4. 点击"Save"按钮
 
 ### 步骤3：触发自动部署
 
@@ -167,19 +204,20 @@
 
 ### 常见问题排查
 
-1. **网站无法访问或显示不正常**
-   - 确认GitHub Pages设置中选择了正确的分支（gh-pages）和目录
-   - 等待几分钟，GitHub Pages可能需要时间来部署
+ 1. **网站无法访问或显示不正常**
+   - 确认GitHub Pages设置中选择了正确的分支（gh-pages）和目录（/root）
+   - 等待10-15分钟，GitHub Pages可能需要时间来部署
    - 检查GitHub Actions的构建日志，查看是否有错误
+   - 确保您的仓库中存在`index.html`文件
 
-2. **GitHub Actions构建失败**
+ 2. **GitHub Actions构建失败**
    - 点击"Actions"选项卡查看详细错误日志
-   - 确认package.json中的依赖和构建脚本是否正确
+   - 确认package.json中的依赖和构建脚本是否正确（应为`"build": "vite build --base=/"`）
    - 检查是否有编译错误
 
-3. **路由问题（刷新页面后404错误）**
+ 3. **路由问题（刷新页面后404错误）**
    - 这是单页应用(SPA)在GitHub Pages上的常见问题
-   - 解决方案：在项目根目录创建一个名为`404.html`的文件，内容与`index.html`相同
+   - 解决方案：项目中已经包含了404.html文件和必要的路由修复脚本。请确保GitHub Pages设置正确，并且构建输出目录设置为dist（而非dist/static）
 
 ## 零成本方案的优势与限制
 
@@ -191,9 +229,10 @@
 
 ### 限制
 - **仅支持静态网站**：无法运行服务器端代码
-- **自定义域名需要额外配置**：虽然可以使用自定义域名，但需要购买域名
-- **文件大小限制**：GitHub仓库有1GB的大小限制（对于大多数静态网站足够）
-- **API调用限制**：如果您的网站需要调用API，可能会受到GitHub Pages的限制
+ 2. **自定义域名需要额外配置**：虽然可以使用自定义域名，但需要购买域名
+ 3. **文件大小限制**：GitHub仓库有1GB的大小限制（对于大多数静态网站足够）
+ 4. **API调用限制**：如果您的网站需要调用API，可能会受到GitHub Pages的限制
+ 5. **部署延迟**：首次部署或更新后，可能需要等待10-15分钟才能完全生效
 
 ## 其他零成本选项（备选方案）
 

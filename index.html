@@ -9,26 +9,36 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
       crossorigin="anonymous"
     />
-    <!-- GitHub Pages 单页应用路由修复 -->
-    <script>
-      // 这个脚本可以帮助修复GitHub Pages上单页应用的路由问题
-      // 当用户刷新页面或直接访问深层链接时，确保应用能正确加载
-      if (window.location.hostname.includes('github.io') && window.history && window.history.pushState) {
-        // 检查是否需要重定向
-        const checkRedirect = () => {
-          // 如果不是根路径且URL中不包含index.html，则重定向到带index.html的路径
-          if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-            const path = window.location.pathname + window.location.search + window.location.hash;
-            window.history.replaceState(null, '', '/index.html' + path);
-            // 强制刷新页面
-            window.location.reload();
-          }
-        };
-        
-        // 页面加载时检查
-        window.addEventListener('load', checkRedirect);
-      }
-    </script>
+     <!-- GitHub Pages 单页应用路由修复 -->
+     <script>
+       // 这个脚本可以帮助修复GitHub Pages上单页应用的路由问题
+       // 当用户刷新页面或直接访问深层链接时，确保应用能正确加载
+       (function() {
+         // 获取当前路径
+         var path = window.location.pathname;
+         
+         // 检查是否是GitHub Pages环境
+         if (window.location.hostname.includes('github.io')) {
+           // 如果不是根路径，且不是指向具体文件，且不是index.html
+           if (path !== '/' && !path.includes('.') && !path.endsWith('/index.html')) {
+             // 重定向到index.html，并带上原始路径作为查询参数
+             window.location.replace('/index.html?path=' + encodeURIComponent(path));
+           }
+         }
+       })();
+     </script>
+     <!-- 备用的404路由修复 -->
+     <script>
+       // 如果页面加载后检测到404，尝试修复
+       if (typeof window !== 'undefined') {
+         window.addEventListener('load', function() {
+           if (document.body.innerHTML.includes('404') && window.location.hostname.includes('github.io')) {
+             var path = window.location.pathname;
+             window.location.replace('/index.html?path=' + encodeURIComponent(path));
+           }
+         });
+       }
+     </script>
   </head>
   <body>
     <div id="root"></div>
