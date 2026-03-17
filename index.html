@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>体育行业标准查询系统</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      crossorigin="anonymous"
+    />
+    <!-- GitHub Pages 单页应用路由修复 -->
+    <script>
+      // 这个脚本可以帮助修复GitHub Pages上单页应用的路由问题
+      // 当用户刷新页面或直接访问深层链接时，确保应用能正确加载
+      if (window.location.hostname.includes('github.io') && window.history && window.history.pushState) {
+        // 检查是否需要重定向
+        const checkRedirect = () => {
+          // 如果不是根路径且URL中不包含index.html，则重定向到带index.html的路径
+          if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
+            const path = window.location.pathname + window.location.search + window.location.hash;
+            window.history.replaceState(null, '', '/index.html' + path);
+            // 强制刷新页面
+            window.location.reload();
+          }
+        };
+        
+        // 页面加载时检查
+        window.addEventListener('load', checkRedirect);
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
