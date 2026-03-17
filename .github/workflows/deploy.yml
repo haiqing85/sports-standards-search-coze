@@ -1,45 +1,47 @@
-name: Deploy React App to GitHub Pages
+name: 部署到 GitHub Pages
 
-    on:
-      push:
-        branches: [ main ]  # 或 master，取决于您的默认分支
-      pull_request:
-        branches: [ main ]
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
 
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
-    jobs:
-      build-and-deploy:
-        runs-on: ubuntu-latest
-        environment:
-          name: github-pages
-          url: ${{ steps.deployment.outputs.page_url }}
-        steps:
-          - name: Checkout code
-           uses: actions/checkout@v3
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
-         - name: Setup Node.js
-           uses: actions/setup-node@v3
-           with:
-             node-version: '18'  # 确保与您的项目兼容
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
 
-         - name: Install dependencies
-           run: npm install
+      - name: 安装 PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
 
-         - name: Build project
-           run: npm run build
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
 
-          - name: Setup Pages
-            uses: actions/configure-pages@v5
+      - name: 安装依赖
+        run: pnpm install
 
-          - name: Upload artifact
-            uses: actions/upload-pages-artifact@v3
-            with:
-              path: './dist'
+      - name: 执行构建
+        run: pnpm run build
 
-          - name: Deploy to GitHub Pages
-            id: deployment
-            uses: actions/deploy-pages@v4
+      - name: 上传构建产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+      - name: 发布到 GitHub Pages
+        uses: actions/deploy-pages@v4
