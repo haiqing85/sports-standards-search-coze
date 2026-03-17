@@ -7,7 +7,7 @@
     "dev:client": "vite --host --port 3000",
     "dev": "pnpm dev:client",
     "build:client": "vite build",
-    "build": "vite build --base=/",
+    "build": "vite build --base=./",
     "build:github": "vite build --base=/"
   },
   "dependencies": {
